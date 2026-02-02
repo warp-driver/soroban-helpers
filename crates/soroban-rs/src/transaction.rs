@@ -11,25 +11,28 @@
 //! - Fee calculation based on transaction simulation
 //! - Transaction optimization through simulation
 //!
-//! ## Example
+//! # Example
 //!
 //! ```rust,no_run
-//! use soroban_rs::{Account, Env, EnvConfigs, TransactionBuilder};
+//! use soroban_rs::{Account, Env, TransactionBuilder, simulate_transaction};
 //! use stellar_xdr::curr::{Memo, Operation, Preconditions};
 //!
 //! async fn example(account: &mut Account, env: &Env, operation: Operation) {
-//!     // Create a transaction builder
-//!     let tx_builder = TransactionBuilder::new(account, env)
+//!     // Option 1: Build and simulate separately (more flexible)
+//!     let tx = TransactionBuilder::new(account, env)
+//!         .add_operation(operation.clone())
+//!         .build()
+//!         .await
+//!         .unwrap();
+//!     
+//!     let simulated_tx = simulate_transaction(tx, env, account).await.unwrap();
+//!     
+//!     // Option 2: Build and simulate together (convenient)
+//!     let tx = TransactionBuilder::new(account, env)
 //!         .add_operation(operation)
-//!         .set_memo(Memo::Text("Example transaction".try_into().unwrap()))
-//!         .set_preconditions(Preconditions::None);
-//!     
-//!     // Build a transaction with simulation to set proper fees
-//!     let tx = tx_builder.simulate_and_build(env, account).await.unwrap();
-//!     
-//!     // Sign and submit the transaction
-//!     let tx_envelope = account.sign_transaction(&tx, &env.network_id()).unwrap();
-//!     env.send_transaction(&tx_envelope).await.unwrap();
+//!         .simulate_and_build(env, account)
+//!         .await
+//!         .unwrap();
 //! }
 //! ```
 use crate::{error::SorobanHelperError, Account, Env};
@@ -229,55 +232,84 @@ impl TransactionBuilder {
         source_account: &Account,
     ) -> Result<Transaction, SorobanHelperError> {
         let tx = self.build().await?;
-        let tx_envelope = source_account.sign_transaction_unsafe(&tx, &env.network_id())?;
-        let simulation = env.simulate_transaction(&tx_envelope).await?;
+        simulate_transaction(tx, env, source_account).await
+    }
+}
+/// Simulates a transaction to determine proper fees and resources.
+///
+/// This function:
+/// 1. Signs the transaction for simulation purposes
+/// 2. Simulates the transaction to determine required resources
+/// 3. Updates the transaction with the correct fees and resource data
+///
+/// This provides flexibility to build and simulate transactions separately,
+/// allowing for custom logic between these steps.
+///
+/// # Parameters
+///
+/// * `tx` - The transaction to simulate
+/// * `env` - The environment for transaction simulation
+/// * `source_account` - The account to use for signing the simulation transaction
+///
+/// # Returns
+///
+/// A transaction optimized for Soroban execution, or an error if simulation fails
+///
+/// # Errors
+///
+/// Returns error if:
+/// - Transaction signing fails
+/// - Simulation fails
+/// - Fee calculation results in a value too large for u32
+/// - Unsupported authorization types are detected
+pub async fn simulate_transaction(
+    mut tx: Transaction,
+    env: &Env,
+    source_account: &Account,
+) -> Result<Transaction, SorobanHelperError> {
+    // Sign transaction for simulation
+    let tx_envelope = source_account.sign_transaction_unsafe(&tx, &env.network_id())?;
 
-        let updated_fee = DEFAULT_TRANSACTION_FEES.max(
-            u32::try_from(
-                (tx.operations.len() as u64 * DEFAULT_TRANSACTION_FEES as u64)
-                    + simulation.min_resource_fee,
-            )
-            .map_err(|_| {
-                SorobanHelperError::InvalidArgument("Transaction fee too high".to_string())
-            })?,
+    // Simulate transaction
+    let simulation = env.simulate_transaction(&tx_envelope).await?;
+
+    // Calculate updated fee
+    tx.fee = DEFAULT_TRANSACTION_FEES.max(
+        u32::try_from(
+            (tx.operations.len() as u64 * DEFAULT_TRANSACTION_FEES as u64)
+                + simulation.min_resource_fee,
+        )
+        .map_err(|_| SorobanHelperError::InvalidArgument("Transaction fee too high".to_string()))?,
+    );
+
+    // Log simulation errors if any
+    if simulation.error.is_some() {
+        println!(
+            "[WARN] Transaction simulation failed with error: {:?}",
+            simulation.error
         );
+    }
 
-        if simulation.error.is_some() {
-            println!(
-                "[WARN] Transaction simulation failed with error: {:?}",
-                simulation.error
-            );
-        }
-
-        let sim_results = simulation.results().unwrap_or_default();
-        for result in &sim_results {
-            for auth in &result.auth {
-                if matches!(auth.credentials, SorobanCredentials::Address(_)) {
-                    return Err(SorobanHelperError::NotSupported(
-                        "Address authorization not yet supported".to_string(),
-                    ));
-                }
+    // Check for unsupported authorization types
+    let sim_results = simulation.results().unwrap_or_default();
+    for result in &sim_results {
+        for auth in &result.auth {
+            if matches!(auth.credentials, SorobanCredentials::Address(_)) {
+                return Err(SorobanHelperError::NotSupported(
+                    "Address authorization not yet supported".to_string(),
+                ));
             }
         }
-
-        let mut tx = Transaction {
-            fee: updated_fee,
-            seq_num: tx.seq_num,
-            source_account: tx.source_account,
-            cond: tx.cond,
-            memo: tx.memo,
-            operations: tx.operations,
-            ext: tx.ext,
-        };
-
-        if let Ok(tx_data) = simulation.transaction_data().map_err(|e| {
-            SorobanHelperError::TransactionFailed(format!("Failed to get transaction data: {}", e))
-        }) {
-            tx.ext = TransactionExt::V1(tx_data);
-        }
-
-        Ok(tx)
     }
+
+    // Update extension with transaction data
+    if let Ok(tx_data) = simulation.transaction_data().map_err(|e| {
+        SorobanHelperError::TransactionFailed(format!("Failed to get transaction data: {}", e))
+    }) {
+        tx.ext = TransactionExt::V1(tx_data);
+    }
+
+    Ok(tx)
 }
 
 #[cfg(test)]
@@ -287,8 +319,9 @@ mod test {
             mock_account_entry, mock_contract_id, mock_env, mock_signer1, mock_simulate_tx_response,
         },
         operation::Operations,
-        transaction::DEFAULT_TRANSACTION_FEES,
-        Account, TransactionBuilder,
+        transaction::{simulate_transaction, DEFAULT_TRANSACTION_FEES}, 
+        Account,
+        TransactionBuilder,
     };
     use stellar_xdr::curr::{Memo, Preconditions, TimeBounds, TimePoint};
 
@@ -414,5 +447,36 @@ mod test {
         assert_eq!(builder_with_two_ops.operations.len(), 2);
         assert_eq!(builder_with_two_ops.operations[0].body, operation1.body);
         assert_eq!(builder_with_two_ops.operations[1].body, operation2.body);
+    }
+
+    #[tokio::test]
+    async fn test_simulate_transaction() {
+        let simulation_fee = 42;
+
+        let account = Account::single(mock_signer1());
+        let get_account_result = Ok(mock_account_entry(&account.account_id().0.to_string()));
+        let simulate_tx_result = Ok(mock_simulate_tx_response(Some(simulation_fee)));
+
+        let env = mock_env(Some(get_account_result), Some(simulate_tx_result), None);
+        let contract_id = mock_contract_id(account.clone(), &env);
+        let operation = Operations::invoke_contract(&contract_id, "test", vec![]).unwrap();
+
+        // Build transaction first
+        let tx = TransactionBuilder::new(&account, &env)
+            .add_operation(operation.clone())
+            .build()
+            .await
+            .unwrap();
+
+        // Verify default fee
+        assert_eq!(tx.fee, DEFAULT_TRANSACTION_FEES);
+
+        // Simulate separately
+        let simulated_tx = simulate_transaction(tx, &env, &account).await.unwrap();
+
+        // Verify fee was updated
+        assert_eq!(simulated_tx.fee, 142); // DEFAULT_TRANSACTION_FEES + simulation_fee
+        assert_eq!(simulated_tx.operations.len(), 1);
+        assert_eq!(simulated_tx.operations[0].body, operation.body);
     }
 }

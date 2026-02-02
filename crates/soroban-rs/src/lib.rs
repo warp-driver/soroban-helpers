@@ -24,7 +24,7 @@ pub use operation::Operations;
 pub use parser::{ParseResult, Parser, ParserType};
 pub use response::SorobanTransactionResponse;
 pub use signer::Signer;
-pub use transaction::TransactionBuilder;
+pub use transaction::{simulate_transaction, TransactionBuilder};
 
 // Re-export mock utilities for testing
 pub use mock::account::*;
