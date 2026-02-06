@@ -319,6 +319,53 @@ impl Contract {
 
         env.send_transaction(&tx_envelope).await
     }
+
+    /// Extends the TTL of this deployed contract to the specified ledger number.
+    ///
+    /// This operation ensures the contract remains accessible and prevents it from
+    /// being archived. The TTL is extended for all contract-related ledger entries
+    /// (WASM code, instance, and storage).
+    ///
+    /// # Parameters
+    ///
+    /// * `extend_to` - The ledger sequence number until which the contract should remain live
+    ///
+    /// # Returns
+    ///
+    /// Ok(()) if the TTL was successfully extended
+    ///
+    /// # Errors
+    ///
+    /// Returns error if:
+    /// - The contract has not been deployed
+    /// - The transaction fails
+    /// - Insufficient fees
+    /// ```
+    pub async fn extend_ttl(
+        &self,
+        extend_to: u32,
+        env: &Env,
+        account: &mut Account,
+    ) -> Result<(), SorobanHelperError> {
+        // Ensure contract is deployed
+        let _contract_id = self
+            .client_configs
+            .as_ref()
+            .ok_or(SorobanHelperError::ContractDeployedConfigsNotSet)?
+            .contract_id;
+
+        // Create the TTL extension operation
+        let extend_operation = Operations::extend_footprint_ttl(extend_to)?;
+
+        // Build and submit the transaction
+        let builder = TransactionBuilder::new(account, env).add_operation(extend_operation);
+
+        let tx = builder.simulate_and_build(env, account).await?;
+        let tx_envelope = account.sign_transaction(&tx, &env.network_id())?;
+
+        env.send_transaction(&tx_envelope).await?;
+        Ok(())
+    }
 }
 
 #[cfg(test)]

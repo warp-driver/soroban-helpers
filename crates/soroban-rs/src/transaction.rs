@@ -35,7 +35,7 @@
 //!         .unwrap();
 //! }
 //! ```
-use crate::{error::SorobanHelperError, Account, Env};
+use crate::{error::SorobanHelperError, Account, Env, Operations};
 use stellar_xdr::curr::{
     Memo, Operation, Preconditions, SequenceNumber, SorobanCredentials, Transaction, TransactionExt,
 };
@@ -234,6 +234,22 @@ impl TransactionBuilder {
         let tx = self.build().await?;
         simulate_transaction(tx, env, source_account).await
     }
+
+    /// Adds an extend footprint TTL operation to the transaction.
+    ///
+    /// This is a convenience method that creates and adds the operation in one step.
+    ///
+    /// # Parameters
+    ///
+    /// * `extend_to` - The ledger sequence number until which entries should remain live
+    ///
+    /// # Returns
+    ///
+    /// Self for method chaining
+    pub fn extend_footprint_ttl(self, extend_to: u32) -> Result<Self, SorobanHelperError> {
+        let operation = Operations::extend_footprint_ttl(extend_to)?;
+        Ok(self.add_operation(operation))
+    }
 }
 /// Simulates a transaction to determine proper fees and resources.
 ///
@@ -319,9 +335,8 @@ mod test {
             mock_account_entry, mock_contract_id, mock_env, mock_signer1, mock_simulate_tx_response,
         },
         operation::Operations,
-        transaction::{simulate_transaction, DEFAULT_TRANSACTION_FEES}, 
-        Account,
-        TransactionBuilder,
+        transaction::{simulate_transaction, DEFAULT_TRANSACTION_FEES},
+        Account, TransactionBuilder,
     };
     use stellar_xdr::curr::{Memo, Preconditions, TimeBounds, TimePoint};
 

@@ -67,7 +67,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+### Example: Extending Contract TTL
 
+To prevent your deployed contracts from being archived, you can extend their Time To Live (TTL):
+```rust
+use soroban_rs::{Contract, Env, Account};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let env = /* ... */;
+    let mut account = /* ... */;
+    
+    // Deploy your contract
+    let contract = Contract::new("path/to/contract.wasm", None)?;
+    let deployed = contract.deploy(&env, &mut account, None).await?;
+    
+    // Extend TTL to ledger 2,000,000 (prevents archival)
+    deployed.extend_ttl(2_000_000, &env, &mut account).await?;
+    
+    println!("Contract TTL extended successfully!");
+    Ok(())
+}
+```
+
+TTL extension is important for production contracts to ensure they remain accessible. Without periodic TTL extensions, contract data will be archived and require restoration before use.
 
 ### Example: using `soroban!()` macro
 

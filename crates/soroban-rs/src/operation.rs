@@ -5,9 +5,10 @@
 //! such as uploading contract code, deploying contracts, and invoking contract functions.
 use stellar_xdr::curr::{
     AccountId, Asset, ContractExecutable, ContractIdPreimage, CreateContractArgs,
-    CreateContractArgsV2, Hash, HostFunction, InvokeContractArgs, InvokeHostFunctionOp, Operation,
-    OperationBody, PaymentOp, ScAddress, ScSymbol, ScVal, SorobanAuthorizationEntry,
-    SorobanAuthorizedFunction, SorobanAuthorizedInvocation, SorobanCredentials, VecM,
+    CreateContractArgsV2, ExtendFootprintTtlOp, Hash, HostFunction, InvokeContractArgs,
+    InvokeHostFunctionOp, Operation, OperationBody, PaymentOp, ScAddress, ScSymbol, ScVal,
+    SorobanAuthorizationEntry, SorobanAuthorizedFunction, SorobanAuthorizedInvocation,
+    SorobanCredentials, VecM,
 };
 
 use crate::error::SorobanHelperError;
@@ -239,6 +240,28 @@ impl Operations {
             }),
         })
     }
+    /// Creates an operation to extend the Time To Live (TTL) of Soroban contract entries.
+    ///
+    /// This operation extends the TTL of ledger entries specified in the transaction's
+    /// read-only footprint, preventing them from being archived.
+    ///
+    /// # Parameters
+    ///
+    /// * `extend_to` - The ledger sequence number until which the entries should remain live
+    ///
+    /// # Returns
+    ///
+    /// An operation that can be added to a transaction to extend entry lifetimes
+    /// ```
+    pub fn extend_footprint_ttl(extend_to: u32) -> Result<Operation, SorobanHelperError> {
+        Ok(Operation {
+            source_account: None,
+            body: OperationBody::ExtendFootprintTtl(ExtendFootprintTtlOp {
+                ext: stellar_xdr::curr::ExtensionPoint::V0,
+                extend_to,
+            }),
+        })
+    }
 }
 
 #[cfg(test)]
@@ -379,5 +402,36 @@ mod test {
             result,
             Err(SorobanHelperError::InvalidArgument(_))
         ));
+    }
+
+    #[test]
+    fn test_extend_footprint_ttl() {
+        let extend_to = 1000000u32;
+        let operation = Operations::extend_footprint_ttl(extend_to).unwrap();
+
+        assert!(matches!(
+            operation.body,
+            OperationBody::ExtendFootprintTtl(_)
+        ));
+
+        if let OperationBody::ExtendFootprintTtl(op) = operation.body {
+            assert_eq!(op.extend_to, extend_to);
+            assert!(matches!(op.ext, stellar_xdr::curr::ExtensionPoint::V0));
+        }
+    }
+
+    #[test]
+    fn test_extend_footprint_ttl_different_values() {
+        // Test with minimum value
+        let min_extend = Operations::extend_footprint_ttl(0).unwrap();
+        if let OperationBody::ExtendFootprintTtl(op) = min_extend.body {
+            assert_eq!(op.extend_to, 0);
+        }
+
+        // Test with large value
+        let max_extend = Operations::extend_footprint_ttl(u32::MAX).unwrap();
+        if let OperationBody::ExtendFootprintTtl(op) = max_extend.body {
+            assert_eq!(op.extend_to, u32::MAX);
+        }
     }
 }
