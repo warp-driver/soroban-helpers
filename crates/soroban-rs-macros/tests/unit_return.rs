@@ -24,49 +24,31 @@ soroban!(
         }
 
         pub fn with_return(env: &Env) -> u32 {
-            // Control case: already works today.
+            // Control case: already worked before the fix.
             0
         }
     }
 "#
 );
 
+// Compile-only: pin the generated return types. If the macro regresses to emitting no return
+// type for unit-returning source methods, this function fails to type-check.
+#[allow(dead_code)]
+async fn _assert_signatures(client: &mut UnitReturnClient) {
+    let _: Result<soroban_rs::SorobanTransactionResponse, soroban_rs::SorobanHelperError> =
+        client.no_return().await;
+
+    let a = soroban_rs::xdr::ScVal::U32(1);
+    let b = soroban_rs::xdr::ScVal::U32(2);
+    let _: Result<soroban_rs::SorobanTransactionResponse, soroban_rs::SorobanHelperError> =
+        client.no_return_with_args(a, b).await;
+
+    let _: Result<soroban_rs::SorobanTransactionResponse, soroban_rs::SorobanHelperError> =
+        client.with_return().await;
+}
+
 #[test]
-fn generated_unit_return_method_returns_result() {
-    // Compile-only assertion: if the macro regresses, this file fails to build with E0308.
-    // We additionally pin the generated signature by taking a function pointer whose type
-    // mentions the expected `Result<_, _>` return.
-    fn _assert_signatures(client: &mut UnitReturnClient) {
-        let _: &mut dyn FnMut(
-            &mut UnitReturnClient,
-        ) -> std::pin::Pin<
-            Box<
-                dyn std::future::Future<
-                    Output = Result<
-                        soroban_rs::SorobanTransactionResponse,
-                        soroban_rs::SorobanHelperError,
-                    >,
-                >,
-            >,
-        > = &mut |c| Box::pin(c.no_return());
-
-        let _: &mut dyn FnMut(
-            &mut UnitReturnClient,
-        ) -> std::pin::Pin<
-            Box<
-                dyn std::future::Future<
-                    Output = Result<
-                        soroban_rs::SorobanTransactionResponse,
-                        soroban_rs::SorobanHelperError,
-                    >,
-                >,
-            >,
-        > = &mut |c| {
-            let a = soroban_rs::xdr::ScVal::U32(1);
-            let b = soroban_rs::xdr::ScVal::U32(2);
-            Box::pin(c.no_return_with_args(a, b))
-        };
-
-        let _ = client;
-    }
+fn macro_expansion_compiles_for_unit_return_methods() {
+    // The real assertion is that this file compiles. Having a live test case keeps
+    // `cargo test -p soroban-rs-macros --test unit_return` meaningful.
 }
