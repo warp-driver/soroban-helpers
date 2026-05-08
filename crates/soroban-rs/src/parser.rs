@@ -1,10 +1,10 @@
 use crate::error::SorobanHelperError;
-use wasi_stellar_rpc_client::GetTransactionResponse;
 use stellar_strkey::Contract as ContractId;
 use stellar_xdr::curr::{
     AccountEntry, LedgerEntryChange, LedgerEntryData, OperationResult, ScAddress, ScVal,
     TransactionMeta, TransactionResultResult,
 };
+use wasi_stellar_rpc_client::GetTransactionResponse;
 
 #[derive(Debug)]
 pub enum ParserType {
@@ -163,11 +163,11 @@ mod tests {
         mock_transaction_response_with_return_value,
     };
     use crate::parser::{ParseResult, Parser, ParserType};
-    use wasi_stellar_rpc_client::GetTransactionResponse;
     use stellar_xdr::curr::{
         AccountEntry, InvokeHostFunctionResult, OperationResult, OperationResultTr, ScVal,
         TransactionResult, TransactionResultExt, TransactionResultResult,
     };
+    use wasi_stellar_rpc_client::GetTransactionResponse;
 
     #[test]
     fn test_new_parser() {

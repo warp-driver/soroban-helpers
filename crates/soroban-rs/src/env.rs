@@ -35,8 +35,8 @@ use crate::{
 };
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
-use wasi_stellar_rpc_client::SimulateTransactionResponse;
 use stellar_xdr::curr::{AccountEntry, Hash, TransactionEnvelope};
+use wasi_stellar_rpc_client::SimulateTransactionResponse;
 
 /// Configuration for a Soroban environment.
 ///

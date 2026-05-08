@@ -1,12 +1,12 @@
 use dotenv::dotenv;
 use ed25519_dalek::SigningKey;
+use std::{env, error::Error};
+use stellar_strkey::ed25519::PrivateKey;
 use wasi_soroban_rs::{
     macros::soroban,
     xdr::{ScAddress, ScVal},
     Account, ClientContractConfigs, ContractId, Env, EnvConfigs, Guard, Signer,
 };
-use std::{env, error::Error};
-use stellar_strkey::ed25519::PrivateKey;
 
 // Generates TokenClient
 soroban!(

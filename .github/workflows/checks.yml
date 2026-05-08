@@ -45,7 +45,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - package: soroban-rs
+          - package: wasi-soroban-rs
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
       - name: 'Override toolchain with MSRV'
@@ -54,6 +54,18 @@ jobs:
         with:
           cache-on-failure: true
       - run: cargo build -p "${{ matrix.package }}"
+  wasi:
+    name: Builds for Wasip2
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
+      - name: 'Install from rust-toolchain.toml'
+        run: rustup show
+      - name: 'Add wasip2 target'
+        run: rustup target add wasm32-wasip2
+      - name: Compile for wasip2
+        run: RUSTFLAGS="--cfg tokio_unstable" cargo build --target wasm32-wasip2 -p wasi-soroban-rs
   formatting:
     name: Code Formatting Check
     runs-on: ubuntu-latest
@@ -86,6 +98,7 @@ jobs:
     if: always()
     needs:
       - lint
+      - wasi
       - dependency-check
       - msrv-check
       - formatting
