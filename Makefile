@@ -1,10 +1,10 @@
 .PHONY: check test fmt fmt-check lint build-wasi all
 
 check:
-	cargo check -p soroban-rs
+	cargo check --workspace
 
 test:
-	cargo test -p soroban-rs
+	cargo test --workspace
 
 fmt:
 	cargo fmt --all
