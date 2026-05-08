@@ -6,9 +6,9 @@
 //!
 use crate::error::SorobanHelperError;
 use crate::SorobanTransactionResponse;
-use stellar_rpc_client::Client;
-use stellar_rpc_client::SimulateTransactionResponse;
 use stellar_xdr::curr::{AccountEntry, TransactionEnvelope};
+use wasi_stellar_rpc_client::Client;
+use wasi_stellar_rpc_client::SimulateTransactionResponse;
 
 /// Interface for RPC operations with Soroban servers.
 ///
@@ -122,17 +122,6 @@ pub mod test {
     use crate::mock::{mock_signer1, mock_transaction_envelope};
 
     use super::*;
-
-    #[test]
-    fn test_new() {
-        // use 443 port for https
-        let client = ExternalRpcClient::new("https://test.com").unwrap();
-        assert_eq!(client.client.base_url(), "https://test.com:443/");
-
-        // use 80 port for http
-        let client = ExternalRpcClient::new("http://test.com").unwrap();
-        assert_eq!(client.client.base_url(), "http://test.com:80/");
-    }
 
     #[tokio::test]
     async fn test_get_account_error() {

@@ -1,5 +1,4 @@
 use std::convert::TryInto;
-use stellar_rpc_client::{GetTransactionResponse, SimulateTransactionResponse};
 use stellar_xdr::curr::{
     AccountEntry, AccountId, ContractEvent, ContractEventBody, ContractEventType, ContractEventV0,
     ExtensionPoint, Hash, LedgerEntry, LedgerEntryChange, LedgerEntryData, LedgerEntryExt, Memo,
@@ -9,6 +8,7 @@ use stellar_xdr::curr::{
     TransactionMetaV3, TransactionResult, TransactionResultExt, TransactionResultResult,
     TransactionV1Envelope, Uint256, VecM,
 };
+use wasi_stellar_rpc_client::{GetTransactionResponse, SimulateTransactionResponse};
 
 use crate::SorobanTransactionResponse;
 
@@ -118,7 +118,11 @@ fn mock_transaction_response_impl(response_type: MockResponseType) -> GetTransac
         result: Some(create_success_tx_result()),
         result_meta: None,
         ledger: None,
-        events: stellar_rpc_client::GetTransactionEvents {
+        application_order: None,
+        fee_bump: None,
+        tx_hash: None,
+        created_at: None,
+        events: wasi_stellar_rpc_client::GetTransactionEvents {
             contract_events: vec![],
             diagnostic_events: vec![],
             transaction_events: vec![],

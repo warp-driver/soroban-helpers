@@ -1,12 +1,12 @@
 use dotenv::from_path;
 use ed25519_dalek::SigningKey;
-use soroban_rs::{
+use std::{env, path::Path};
+use stellar_strkey::{ed25519::PrivateKey, Contract as ContractId};
+use wasi_soroban_rs::{
     Account, AuthorizedCallsForContract, ClientContractConfigs, Env, EnvConfigs, Guard, IntoScVal,
     Signer,
 };
-use soroban_rs_macros::soroban;
-use std::{env, path::Path};
-use stellar_strkey::{ed25519::PrivateKey, Contract as ContractId};
+use wasi_soroban_rs_macros::soroban;
 
 // generates TokenMockClient binding TokenMock contract.
 soroban!("fixtures/lib.rs");

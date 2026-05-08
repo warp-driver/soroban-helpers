@@ -1,5 +1,5 @@
-use stellar_rpc_client::GetTransactionResponse;
 use stellar_xdr::curr::{ScVal, SorobanTransactionMeta, TransactionMeta, TransactionMetaV3};
+use wasi_stellar_rpc_client::GetTransactionResponse;
 
 use crate::SorobanHelperError;
 
@@ -164,7 +164,11 @@ mod tests {
             result: None,
             result_meta: None,
             ledger: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            application_order: None,
+            fee_bump: None,
+            tx_hash: None,
+            created_at: None,
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -209,7 +213,11 @@ mod tests {
             result: Some(transaction_result),
             result_meta: Some(TransactionMeta::V3(meta_v3)),
             ledger: Some(123456), // Example ledger number
-            events: stellar_rpc_client::GetTransactionEvents {
+            application_order: None,
+            fee_bump: None,
+            tx_hash: None,
+            created_at: None,
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -244,7 +252,11 @@ mod tests {
             result: None,
             result_meta: None,
             ledger: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            application_order: None,
+            fee_bump: None,
+            tx_hash: None,
+            created_at: None,
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -294,7 +306,11 @@ mod tests {
             result: None,
             result_meta: None,
             ledger: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            application_order: None,
+            fee_bump: None,
+            tx_hash: None,
+            created_at: None,
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -342,7 +358,11 @@ mod tests {
             result: Some(transaction_result),
             result_meta: Some(TransactionMeta::V3(meta_v3)),
             ledger: Some(123456), // Example ledger number
-            events: stellar_rpc_client::GetTransactionEvents {
+            application_order: None,
+            fee_bump: None,
+            tx_hash: None,
+            created_at: None,
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],

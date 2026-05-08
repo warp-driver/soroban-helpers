@@ -18,7 +18,7 @@ fn test() {
 }
 
 // Test implementation using injected arguments.
-#[soroban_test_helpers::test]
+#[wasi_soroban_test_helpers::test]
 fn test_injected_args(env: Env, alice: Address, bob: Address) {
     let contract_id = env.register(Token, (19_u32,));
     let client = TokenClient::new(&env, &contract_id);

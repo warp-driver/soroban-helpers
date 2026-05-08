@@ -30,12 +30,12 @@ pub use transaction::{simulate_transaction, TransactionBuilder};
 pub use mock::account::*;
 pub use mock::transaction::*;
 
-pub use stellar_rpc_client::GetTransactionResponse;
 pub use stellar_strkey::Contract as ContractId;
+pub use wasi_stellar_rpc_client::GetTransactionResponse;
 
 // re-exports
-pub use stellar_rpc_client;
 pub use stellar_xdr::curr as xdr;
+pub use wasi_stellar_rpc_client;
 
 // traits
 pub use scval::IntoScVal;

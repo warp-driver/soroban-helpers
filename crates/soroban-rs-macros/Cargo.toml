@@ -1,6 +1,6 @@
 [package]
-name = "soroban-rs-macros"
-version = "0.2.4"
+name = "wasi-soroban-rs-macros"
+version = "0.2.7"
 edition.workspace = true
 description.workspace = true
 license.workspace = true

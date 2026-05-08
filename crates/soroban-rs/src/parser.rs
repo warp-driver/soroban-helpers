@@ -1,10 +1,10 @@
 use crate::error::SorobanHelperError;
-use stellar_rpc_client::GetTransactionResponse;
 use stellar_strkey::Contract as ContractId;
 use stellar_xdr::curr::{
     AccountEntry, LedgerEntryChange, LedgerEntryData, OperationResult, ScAddress, ScVal,
     TransactionMeta, TransactionResultResult,
 };
+use wasi_stellar_rpc_client::GetTransactionResponse;
 
 #[derive(Debug)]
 pub enum ParserType {
@@ -163,11 +163,11 @@ mod tests {
         mock_transaction_response_with_return_value,
     };
     use crate::parser::{ParseResult, Parser, ParserType};
-    use stellar_rpc_client::GetTransactionResponse;
     use stellar_xdr::curr::{
         AccountEntry, InvokeHostFunctionResult, OperationResult, OperationResultTr, ScVal,
         TransactionResult, TransactionResultExt, TransactionResultResult,
     };
+    use wasi_stellar_rpc_client::GetTransactionResponse;
 
     #[test]
     fn test_new_parser() {
@@ -286,7 +286,11 @@ mod tests {
             result: None, // This is what we're testing - no result
             result_meta: None,
             ledger: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            application_order: None,
+            fee_bump: None,
+            tx_hash: None,
+            created_at: None,
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -320,7 +324,11 @@ mod tests {
                 result: TransactionResultResult::TxSuccess(vec![].try_into().unwrap()),
                 ext: TransactionResultExt::V0,
             }),
-            events: stellar_rpc_client::GetTransactionEvents {
+            application_order: None,
+            fee_bump: None,
+            tx_hash: None,
+            created_at: None,
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -366,7 +374,11 @@ mod tests {
                 ext: TransactionResultExt::V0,
             }),
             result_meta: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            application_order: None,
+            fee_bump: None,
+            tx_hash: None,
+            created_at: None,
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],

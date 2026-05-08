@@ -13,15 +13,15 @@ name = "send"
 path = "src/scripts/send.rs"
 
 [dependencies]
-soroban-test-helpers.workspace = true
+wasi-soroban-test-helpers.workspace = true
 soroban-sdk = { workspace = true }
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }
 
 ## scripts dependencies.
-soroban-rs.workspace = true
+wasi-soroban-rs.workspace = true
 dotenv.workspace = true
 ed25519-dalek.workspace = true
 stellar-strkey.workspace = true
-tokio.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread"] }

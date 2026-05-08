@@ -1,4 +1,4 @@
-pub use soroban_rs_macros::soroban;
+pub use wasi_soroban_rs_macros::soroban;
 
 #[cfg(test)]
 pub mod test {
@@ -6,7 +6,7 @@ pub mod test {
 
     use super::*;
     use crate::{
-        self as soroban_rs,
+        self as wasi_soroban_rs,
         mock::{
             account::mock_signer2, mock_account_entry, mock_contract_id, mock_env, mock_signer1,
             mock_simulate_tx_response, mock_transaction_response,
