@@ -39,3 +39,4 @@ soroban-rs-macros.workspace = true
 # example dependency
 dotenv.workspace = true
 tempfile.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread"] }

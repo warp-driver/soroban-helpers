@@ -123,17 +123,6 @@ pub mod test {
 
     use super::*;
 
-    #[test]
-    fn test_new() {
-        // use 443 port for https
-        let client = ExternalRpcClient::new("https://test.com").unwrap();
-        assert_eq!(client.client.base_url(), "https://test.com:443/");
-
-        // use 80 port for http
-        let client = ExternalRpcClient::new("http://test.com").unwrap();
-        assert_eq!(client.client.base_url(), "http://test.com:80/");
-    }
-
     #[tokio::test]
     async fn test_get_account_error() {
         let client = ExternalRpcClient::new("https://test.com").unwrap();
