@@ -5,7 +5,7 @@ use ed25519_dalek::SigningKey;
 use std::default::Default;
 use std::str::FromStr;
 use std::sync::Arc;
-use stellar_rpc_client::SimulateTransactionResponse;
+use wasi_stellar_rpc_client::SimulateTransactionResponse;
 use stellar_strkey::ed25519::PrivateKey;
 use stellar_strkey::Contract as ContractStrKey;
 use stellar_xdr::curr::{

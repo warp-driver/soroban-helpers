@@ -12,7 +12,7 @@
 //! ## Example
 //!
 //! ```rust,ignore
-//! use soroban_test_helpers::test;
+//! use wasi_soroban_test_helpers::test;
 //! use soroban_sdk::{Env, Address};
 //!
 //! #[test]

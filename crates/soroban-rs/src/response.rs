@@ -1,4 +1,4 @@
-use stellar_rpc_client::GetTransactionResponse;
+use wasi_stellar_rpc_client::GetTransactionResponse;
 use stellar_xdr::curr::{ScVal, SorobanTransactionMeta, TransactionMeta, TransactionMetaV3};
 
 use crate::SorobanHelperError;
@@ -168,7 +168,7 @@ mod tests {
             fee_bump: None,
             tx_hash: None,
             created_at: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -217,7 +217,7 @@ mod tests {
             fee_bump: None,
             tx_hash: None,
             created_at: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -256,7 +256,7 @@ mod tests {
             fee_bump: None,
             tx_hash: None,
             created_at: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -310,7 +310,7 @@ mod tests {
             fee_bump: None,
             tx_hash: None,
             created_at: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -362,7 +362,7 @@ mod tests {
             fee_bump: None,
             tx_hash: None,
             created_at: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],

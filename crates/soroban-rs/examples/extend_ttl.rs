@@ -8,7 +8,7 @@
 
 use dotenv::from_path;
 use ed25519_dalek::SigningKey;
-use soroban_rs::{Account, Contract, Env, EnvConfigs, IntoScVal, Signer};
+use wasi_soroban_rs::{Account, Contract, Env, EnvConfigs, IntoScVal, Signer};
 use std::{env, error::Error, path::Path};
 use stellar_strkey::ed25519::PrivateKey;
 

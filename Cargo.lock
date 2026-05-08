@@ -2509,11 +2509,11 @@ version = "0.2.3"
 dependencies = [
  "dotenv",
  "ed25519-dalek",
- "soroban-rs",
  "soroban-sdk",
- "soroban-test-helpers",
  "stellar-strkey 0.0.16",
  "tokio",
+ "wasi-soroban-rs",
+ "wasi-soroban-test-helpers",
 ]
 
 [[package]]
@@ -2528,33 +2528,6 @@ dependencies = [
  "soroban-env-common",
  "soroban-env-host",
  "thiserror 1.0.69",
-]
-
-[[package]]
-name = "soroban-rs"
-version = "0.2.6"
-dependencies = [
- "async-trait",
- "dotenv",
- "ed25519-dalek",
- "hex",
- "rand 0.9.2",
- "sha2",
- "soroban-rs-macros",
- "stellar-strkey 0.0.16",
- "stellar-xdr",
- "tempfile",
- "tokio",
- "wasi-stellar-rpc-client",
-]
-
-[[package]]
-name = "soroban-rs-macros"
-version = "0.2.4"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -2628,15 +2601,6 @@ dependencies = [
  "stellar-xdr",
  "syn",
  "thiserror 1.0.69",
-]
-
-[[package]]
-name = "soroban-test-helpers"
-version = "0.2.4"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -3164,6 +3128,42 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.18",
+]
+
+[[package]]
+name = "wasi-soroban-rs"
+version = "0.2.7"
+dependencies = [
+ "async-trait",
+ "dotenv",
+ "ed25519-dalek",
+ "hex",
+ "rand 0.9.2",
+ "sha2",
+ "stellar-strkey 0.0.16",
+ "stellar-xdr",
+ "tempfile",
+ "tokio",
+ "wasi-soroban-rs-macros",
+ "wasi-stellar-rpc-client",
+]
+
+[[package]]
+name = "wasi-soroban-rs-macros"
+version = "0.2.7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "wasi-soroban-test-helpers"
+version = "0.2.7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

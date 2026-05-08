@@ -1,5 +1,5 @@
 use crate::error::SorobanHelperError;
-use stellar_rpc_client::GetTransactionResponse;
+use wasi_stellar_rpc_client::GetTransactionResponse;
 use stellar_strkey::Contract as ContractId;
 use stellar_xdr::curr::{
     AccountEntry, LedgerEntryChange, LedgerEntryData, OperationResult, ScAddress, ScVal,
@@ -163,7 +163,7 @@ mod tests {
         mock_transaction_response_with_return_value,
     };
     use crate::parser::{ParseResult, Parser, ParserType};
-    use stellar_rpc_client::GetTransactionResponse;
+    use wasi_stellar_rpc_client::GetTransactionResponse;
     use stellar_xdr::curr::{
         AccountEntry, InvokeHostFunctionResult, OperationResult, OperationResultTr, ScVal,
         TransactionResult, TransactionResultExt, TransactionResultResult,
@@ -290,7 +290,7 @@ mod tests {
             fee_bump: None,
             tx_hash: None,
             created_at: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -328,7 +328,7 @@ mod tests {
             fee_bump: None,
             tx_hash: None,
             created_at: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],
@@ -378,7 +378,7 @@ mod tests {
             fee_bump: None,
             tx_hash: None,
             created_at: None,
-            events: stellar_rpc_client::GetTransactionEvents {
+            events: wasi_stellar_rpc_client::GetTransactionEvents {
                 contract_events: vec![],
                 diagnostic_events: vec![],
                 transaction_events: vec![],

@@ -23,7 +23,7 @@ quote = "1.0"
 proc-macro2 = "1.0"
 soroban-sdk = "26.0.0"
 tokio = { version = "1.52.0", features = ["sync", "io-util", "macros", "rt", "time"] }
-stellar-rpc-client = { package = "wasi-stellar-rpc-client", version = "26.0.0-rc.3" }
+wasi-stellar-rpc-client = { version = "26.0.0-rc.3" }
 stellar-xdr = { version = "26.0.0", features = ["serde", "serde_json"] }
 stellar-strkey = "0.0.16"
 ed25519-dalek = "2.1.1"
@@ -35,6 +35,6 @@ async-trait = "0.1.88"
 tempfile = "3.10.1"
 
 # members
-soroban-test-helpers = { path = "crates/soroban-test-helpers" }
-soroban-rs = { path = "crates/soroban-rs" }
-soroban-rs-macros = { path = "crates/soroban-rs-macros", version = "0.2.3" }
+wasi-soroban-test-helpers = { path = "crates/soroban-test-helpers" }
+wasi-soroban-rs = { path = "crates/soroban-rs" }
+wasi-soroban-rs-macros = { path = "crates/soroban-rs-macros", version = "0.2.7" }

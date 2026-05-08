@@ -12,8 +12,8 @@
 //! ## Example
 //!
 //! ```rust,ignore
-//! use soroban_rs_macros::soroban;
-//! use soroban_rs::{xdr::ScVal, ClientContractConfigs};
+//! use wasi_soroban_rs_macros::soroban;
+//! use wasi_soroban_rs::{xdr::ScVal, ClientContractConfigs};
 //!
 //! soroban!(r#"
 //!     pub struct Token;
@@ -137,7 +137,7 @@ pub fn soroban(input: TokenStream) -> TokenStream {
             .map(|arg| match arg {
                 FnArg::Typed(pat_type) => {
                     let pat = &pat_type.pat;
-                    quote! { #pat : soroban_rs::xdr::ScVal }
+                    quote! { #pat : wasi_soroban_rs::xdr::ScVal }
                 }
                 FnArg::Receiver(r) => quote! { #r },
             })
@@ -162,7 +162,7 @@ pub fn soroban(input: TokenStream) -> TokenStream {
         let transformed_output = match &method.sig.output {
             ReturnType::Default => quote! {},
             ReturnType::Type(_, _) => {
-                quote! { -> Result<soroban_rs::SorobanTransactionResponse, soroban_rs::SorobanHelperError>  }
+                quote! { -> Result<wasi_soroban_rs::SorobanTransactionResponse, wasi_soroban_rs::SorobanHelperError>  }
             }
         };
 
@@ -176,14 +176,14 @@ pub fn soroban(input: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         pub struct #client_struct_ident {
-            client_configs: soroban_rs::ClientContractConfigs,
-            contract: soroban_rs::Contract,
+            client_configs: wasi_soroban_rs::ClientContractConfigs,
+            contract: wasi_soroban_rs::Contract,
         }
 
         impl #client_struct_ident {
             #(#transformed_methods)*
-            pub fn new(client_configs: &soroban_rs::ClientContractConfigs) -> Self {
-                let contract = soroban_rs::Contract::from_configs(client_configs.clone());
+            pub fn new(client_configs: &wasi_soroban_rs::ClientContractConfigs) -> Self {
+                let contract = wasi_soroban_rs::Contract::from_configs(client_configs.clone());
                 Self { client_configs: client_configs.clone(), contract }
             }
 

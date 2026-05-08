@@ -13,7 +13,7 @@
 //! ## Example
 //!
 //! ```rust
-//! use soroban_rs::{Env, EnvConfigs};
+//! use wasi_soroban_rs::{Env, EnvConfigs};
 //! use stellar_xdr::curr::TransactionEnvelope;
 //!
 //! async fn example() {
@@ -35,7 +35,7 @@ use crate::{
 };
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
-use stellar_rpc_client::SimulateTransactionResponse;
+use wasi_stellar_rpc_client::SimulateTransactionResponse;
 use stellar_xdr::curr::{AccountEntry, Hash, TransactionEnvelope};
 
 /// Configuration for a Soroban environment.

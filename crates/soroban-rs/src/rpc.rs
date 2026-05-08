@@ -6,8 +6,8 @@
 //!
 use crate::error::SorobanHelperError;
 use crate::SorobanTransactionResponse;
-use stellar_rpc_client::Client;
-use stellar_rpc_client::SimulateTransactionResponse;
+use wasi_stellar_rpc_client::Client;
+use wasi_stellar_rpc_client::SimulateTransactionResponse;
 use stellar_xdr::curr::{AccountEntry, TransactionEnvelope};
 
 /// Interface for RPC operations with Soroban servers.

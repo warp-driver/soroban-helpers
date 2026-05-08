@@ -1,5 +1,5 @@
 use dotenv::from_path;
-use soroban_rs::{Account, AccountConfig, Env, EnvConfigs, Signer};
+use wasi_soroban_rs::{Account, AccountConfig, Env, EnvConfigs, Signer};
 use std::{env, path::Path};
 use stellar_strkey::ed25519::PrivateKey;
 

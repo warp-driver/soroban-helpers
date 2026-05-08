@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use ed25519_dalek::SigningKey;
-use soroban_rs::{
+use wasi_soroban_rs::{
     macros::soroban,
     xdr::{ScAddress, ScVal},
     Account, ClientContractConfigs, ContractId, Env, EnvConfigs, Guard, Signer,

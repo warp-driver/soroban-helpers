@@ -13,7 +13,7 @@
 //! ## Example
 //!
 //! ```rust,no_run
-//! use soroban_rs::{Account, Env, EnvConfigs, Signer};
+//! use wasi_soroban_rs::{Account, Env, EnvConfigs, Signer};
 //! use ed25519_dalek::SigningKey;
 //!
 //! // Example private key (32 bytes)
@@ -97,7 +97,7 @@ impl From<AccountSequence> for i64 {
 /// # Example
 ///
 /// ```rust,no_run
-/// use soroban_rs::AccountConfig;
+/// use wasi_soroban_rs::AccountConfig;
 /// use stellar_strkey::ed25519::PublicKey;
 ///
 /// let config = AccountConfig::new()

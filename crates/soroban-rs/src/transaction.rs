@@ -14,7 +14,7 @@
 //! # Example
 //!
 //! ```rust,no_run
-//! use soroban_rs::{Account, Env, TransactionBuilder, simulate_transaction};
+//! use wasi_soroban_rs::{Account, Env, TransactionBuilder, simulate_transaction};
 //! use stellar_xdr::curr::{Memo, Operation, Preconditions};
 //!
 //! async fn example(account: &mut Account, env: &Env, operation: Operation) {

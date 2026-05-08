@@ -7,7 +7,7 @@
 //! ## Example
 //!
 //! ```rust,no_run
-//! use soroban_rs::{Env, Signer};
+//! use wasi_soroban_rs::{Env, Signer};
 //! use ed25519_dalek::SigningKey;
 //! use stellar_xdr::curr::Transaction;
 //!

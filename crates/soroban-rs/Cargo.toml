@@ -1,6 +1,6 @@
 [package]
-name = "soroban-rs"
-version = "0.2.6"
+name = "wasi-soroban-rs"
+version = "0.2.7"
 edition.workspace = true
 description.workspace = true
 license.workspace = true
@@ -23,7 +23,7 @@ path = "examples/invoke_contract.rs"
 
 [dependencies]
 tokio.workspace = true
-stellar-rpc-client.workspace = true
+wasi-stellar-rpc-client.workspace = true
 stellar-xdr.workspace = true
 stellar-strkey.workspace = true
 ed25519-dalek.workspace = true
@@ -32,8 +32,8 @@ rand.workspace = true
 hex.workspace = true
 async-trait.workspace = true
 
-# soroban-rs-macros workspace dependency
-soroban-rs-macros.workspace = true
+# wasi-soroban-rs-macros workspace dependency
+wasi-soroban-rs-macros.workspace = true
 
 [dev-dependencies]
 # example dependency
