@@ -2,11 +2,11 @@ use std::convert::TryInto;
 use stellar_xdr::curr::{
     AccountEntry, AccountId, ContractEvent, ContractEventBody, ContractEventType, ContractEventV0,
     ExtensionPoint, Hash, LedgerEntry, LedgerEntryChange, LedgerEntryData, LedgerEntryExt, Memo,
-    MuxedAccount, Operation, OperationBody, OperationMeta, OperationResult, Preconditions,
-    ScAddress, ScVal, SequenceNumber, SetOptionsOp, SorobanTransactionMeta,
-    SorobanTransactionMetaExt, Transaction, TransactionEnvelope, TransactionExt, TransactionMeta,
-    TransactionMetaV3, TransactionResult, TransactionResultExt, TransactionResultResult,
-    TransactionV1Envelope, Uint256, VecM,
+    MuxedAccount, Operation, OperationBody, OperationMeta, OperationMetaV2, OperationResult,
+    Preconditions, ScAddress, ScVal, SequenceNumber, SetOptionsOp, SorobanTransactionMeta,
+    SorobanTransactionMetaExt, SorobanTransactionMetaV2, Transaction, TransactionEnvelope,
+    TransactionExt, TransactionMeta, TransactionMetaV3, TransactionMetaV4, TransactionResult,
+    TransactionResultExt, TransactionResultResult, TransactionV1Envelope, Uint256, VecM,
 };
 use wasi_stellar_rpc_client::{GetTransactionResponse, SimulateTransactionResponse};
 
@@ -211,6 +211,84 @@ fn create_soroban_tx_meta_with_return_value(return_val: ScVal) -> TransactionMet
         tx_changes_after: Default::default(),
         operations: Default::default(),
     })
+}
+
+#[allow(dead_code)]
+fn create_soroban_tx_meta_v4_with_return_value(return_val: Option<ScVal>) -> TransactionMeta {
+    TransactionMeta::V4(TransactionMetaV4 {
+        ext: ExtensionPoint::V0,
+        soroban_meta: Some(SorobanTransactionMetaV2 {
+            ext: SorobanTransactionMetaExt::V0,
+            return_value: return_val,
+        }),
+        tx_changes_before: Default::default(),
+        tx_changes_after: Default::default(),
+        operations: Default::default(),
+        events: Default::default(),
+        diagnostic_events: Default::default(),
+    })
+}
+
+#[allow(dead_code)]
+fn create_tx_meta_v4_with_account_entry(account: AccountEntry) -> TransactionMeta {
+    let ledger_entry = LedgerEntry {
+        last_modified_ledger_seq: 1,
+        data: LedgerEntryData::Account(account),
+        ext: LedgerEntryExt::V0,
+    };
+
+    let change = LedgerEntryChange::Updated(ledger_entry);
+    let changes = VecM::try_from(vec![change]).unwrap_or_default();
+    let op_meta = OperationMetaV2 {
+        ext: ExtensionPoint::V0,
+        changes: stellar_xdr::curr::LedgerEntryChanges(changes),
+        events: Default::default(),
+    };
+
+    let operations = VecM::try_from(vec![op_meta]).unwrap_or_default();
+
+    TransactionMeta::V4(TransactionMetaV4 {
+        ext: ExtensionPoint::V0,
+        soroban_meta: None,
+        tx_changes_before: Default::default(),
+        tx_changes_after: Default::default(),
+        operations,
+        events: Default::default(),
+        diagnostic_events: Default::default(),
+    })
+}
+
+/// Mocks a `GetTransactionResponse` carrying protocol-23+ `TransactionMetaV4`
+/// with a Soroban return value, mirroring `mock_transaction_response_with_return_value`.
+#[allow(dead_code)]
+pub fn mock_transaction_response_v4_with_return_value(
+    return_val: ScVal,
+) -> SorobanTransactionResponse {
+    let mut response = mock_transaction_response_impl(MockResponseType::Basic);
+    response.result_meta = Some(create_soroban_tx_meta_v4_with_return_value(Some(
+        return_val,
+    )));
+    SorobanTransactionResponse::from(response)
+}
+
+/// Mocks a `GetTransactionResponse` with `TransactionMetaV4` whose Soroban meta
+/// is present but has no return value (`returnValue` absent in V2).
+#[allow(dead_code)]
+pub fn mock_transaction_response_v4_without_return_value() -> SorobanTransactionResponse {
+    let mut response = mock_transaction_response_impl(MockResponseType::Basic);
+    response.result_meta = Some(create_soroban_tx_meta_v4_with_return_value(None));
+    SorobanTransactionResponse::from(response)
+}
+
+/// Mocks a `GetTransactionResponse` with `TransactionMetaV4` carrying an updated
+/// account entry, mirroring `mock_transaction_response_with_account_entry`.
+#[allow(dead_code)]
+pub fn mock_transaction_response_v4_with_account_entry(
+    account: AccountEntry,
+) -> GetTransactionResponse {
+    let mut response = mock_transaction_response_impl(MockResponseType::Basic);
+    response.result_meta = Some(create_tx_meta_v4_with_account_entry(account));
+    response
 }
 
 #[allow(dead_code)]

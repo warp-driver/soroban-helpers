@@ -8,9 +8,11 @@ pub mod transaction;
 pub use transaction::{
     create_contract_id_val, create_mock_contract_event, create_mock_set_options_tx_envelope,
     mock_simulate_tx_response, mock_transaction, mock_transaction_envelope,
-    mock_transaction_response, mock_transaction_response_with_account_entry,
-    mock_transaction_response_with_return_value, MockGetTransactionResponse, MockTransactionMeta,
-    MockTransactionResult,
+    mock_transaction_response, mock_transaction_response_v4_with_account_entry,
+    mock_transaction_response_v4_with_return_value,
+    mock_transaction_response_v4_without_return_value,
+    mock_transaction_response_with_account_entry, mock_transaction_response_with_return_value,
+    MockGetTransactionResponse, MockTransactionMeta, MockTransactionResult,
 };
 
 // Re-export account mock functions
