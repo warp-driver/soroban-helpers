@@ -110,19 +110,28 @@ impl Parser {
     }
 
     fn extract_account_entry(&self, meta: &TransactionMeta) -> Option<AccountEntry> {
-        match meta {
-            TransactionMeta::V3(v3) => v3.operations.last().and_then(|op| {
-                op.changes.0.iter().rev().find_map(|change| match change {
-                    LedgerEntryChange::Updated(entry) => {
-                        if let LedgerEntryData::Account(account) = &entry.data {
-                            Some(account.clone())
-                        } else {
-                            None
-                        }
+        let find_account = |changes: &[LedgerEntryChange]| {
+            changes.iter().rev().find_map(|change| match change {
+                LedgerEntryChange::Updated(entry) => {
+                    if let LedgerEntryData::Account(account) = &entry.data {
+                        Some(account.clone())
+                    } else {
+                        None
                     }
-                    _ => None,
-                })
-            }),
+                }
+                _ => None,
+            })
+        };
+
+        match meta {
+            TransactionMeta::V3(v3) => v3
+                .operations
+                .last()
+                .and_then(|op| find_account(op.changes.0.as_slice())),
+            TransactionMeta::V4(v4) => v4
+                .operations
+                .last()
+                .and_then(|op| find_account(op.changes.0.as_slice())),
             _ => None,
         }
     }
@@ -130,6 +139,13 @@ impl Parser {
     fn extract_return_value(&self, meta: &TransactionMeta) -> Option<ScVal> {
         match meta {
             TransactionMeta::V3(v3) => v3.soroban_meta.as_ref().map(|sm| sm.return_value.clone()),
+            // Protocol 23 introduced `TransactionMetaV4`, where the Soroban
+            // return value moved into `SorobanTransactionMetaV2.return_value`
+            // and became an `Option<ScVal>`.
+            TransactionMeta::V4(v4) => v4
+                .soroban_meta
+                .as_ref()
+                .and_then(|sm| sm.return_value.clone()),
             _ => None,
         }
     }
@@ -159,8 +175,10 @@ impl Parser {
 mod tests {
     use crate::error::SorobanHelperError;
     use crate::mock::transaction::{
-        create_contract_id_val, mock_transaction_response_with_account_entry,
-        mock_transaction_response_with_return_value,
+        create_contract_id_val, mock_transaction_response_v4_with_account_entry,
+        mock_transaction_response_v4_with_return_value,
+        mock_transaction_response_v4_without_return_value,
+        mock_transaction_response_with_account_entry, mock_transaction_response_with_return_value,
     };
     use crate::parser::{ParseResult, Parser, ParserType};
     use stellar_xdr::curr::{
@@ -229,6 +247,76 @@ mod tests {
 
         let result = parser.parse(&res.response);
         assert!(matches!(result, Ok(ParseResult::Deploy(Some(_)))));
+    }
+
+    #[test]
+    fn test_deploy_parser_v4_meta() {
+        // Protocol 23+ networks return `TransactionMetaV4`; the deploy must
+        // still recover the new contract id from the V4 Soroban return value.
+        let parser = Parser::new(ParserType::Deploy);
+
+        let contract_val = create_contract_id_val();
+        let res = mock_transaction_response_v4_with_return_value(contract_val.clone());
+
+        let result = parser.parse(&res.response);
+        assert!(matches!(result, Ok(ParseResult::Deploy(Some(_)))));
+    }
+
+    #[test]
+    fn test_deploy_parser_v4_meta_no_return_value() {
+        // V4 Soroban meta with an absent return value falls back to `Deploy(None)`.
+        let parser = Parser::new(ParserType::Deploy);
+
+        let res = mock_transaction_response_v4_without_return_value();
+
+        let result = parser.parse(&res.response);
+        assert!(matches!(result, Ok(ParseResult::Deploy(None))));
+    }
+
+    #[test]
+    fn test_invoke_function_parser_v4_meta() {
+        let parser = Parser::new(ParserType::InvokeFunction);
+
+        let return_val = ScVal::I32(42);
+        let res = mock_transaction_response_v4_with_return_value(return_val.clone());
+
+        let result = parser.parse(&res.response);
+        assert!(matches!(result, Ok(ParseResult::InvokeFunction(Some(_)))));
+        if let Ok(ParseResult::InvokeFunction(Some(value))) = result {
+            assert_eq!(value, return_val);
+        }
+    }
+
+    #[test]
+    fn test_account_set_options_parser_v4_meta() {
+        let parser = Parser::new(ParserType::AccountSetOptions);
+
+        let account_entry = AccountEntry {
+            account_id: stellar_xdr::curr::AccountId(
+                stellar_xdr::curr::PublicKey::PublicKeyTypeEd25519(stellar_xdr::curr::Uint256(
+                    [0; 32],
+                )),
+            ),
+            balance: 1000,
+            seq_num: 123.into(),
+            num_sub_entries: 0,
+            inflation_dest: None,
+            flags: 0,
+            home_domain: stellar_xdr::curr::String32(vec![].try_into().unwrap()),
+            thresholds: stellar_xdr::curr::Thresholds([0, 0, 0, 0]),
+            signers: stellar_xdr::curr::VecM::default(),
+            ext: stellar_xdr::curr::AccountEntryExt::V0,
+        };
+        let response = mock_transaction_response_v4_with_account_entry(account_entry.clone());
+
+        let result = parser.parse(&response);
+        assert!(matches!(
+            result,
+            Ok(ParseResult::AccountSetOptions(Some(_)))
+        ));
+        if let Ok(ParseResult::AccountSetOptions(Some(acct))) = result {
+            assert_eq!(acct.balance, 1000);
+        }
     }
 
     #[test]
