@@ -154,6 +154,23 @@ impl Signer {
 
         Ok(DecoratedSignature { hint, signature })
     }
+
+    /// Signs a raw payload with this signer's ed25519 key.
+    ///
+    /// Unlike [`Signer::sign_transaction`], this performs no hashing or
+    /// envelope wrapping — it signs `payload` directly. It is used to authorize
+    /// Soroban auth-entry preimage digests (see [`crate::sign_auth_entry`]).
+    ///
+    /// # Parameters
+    ///
+    /// * `payload` - The bytes to sign (e.g. a 32-byte auth-preimage digest)
+    ///
+    /// # Returns
+    ///
+    /// The 64-byte ed25519 signature
+    pub fn sign_payload(&self, payload: &[u8]) -> [u8; 64] {
+        self.signing_key.clone().sign(payload).to_bytes()
+    }
 }
 
 #[cfg(test)]

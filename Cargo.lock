@@ -3045,6 +3045,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "warpdrive-multisig-account"
+version = "0.1.0"
+dependencies = [
+ "ed25519-dalek",
+ "sha2",
+ "soroban-sdk",
+ "wasi-soroban-rs",
+]
+
+[[package]]
 name = "wasi"
 version = "0.11.1+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

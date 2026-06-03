@@ -306,14 +306,21 @@ pub async fn simulate_transaction(
         );
     }
 
-    // Check for unsupported authorization types
+    // This build path signs only as the source account, so an `Address`
+    // credential means the call needs a signature from someone else. Surface
+    // that clearly — naming the address and the auth-aware path — instead of
+    // building a transaction that would fail authorization on submission.
+    // Callers that hold the address's signers should build the transaction and
+    // use `simulate_transaction_with_auth` / `sign_auth_entry`.
     let sim_results = simulation.results().unwrap_or_default();
     for result in &sim_results {
         for auth in &result.auth {
-            if matches!(auth.credentials, SorobanCredentials::Address(_)) {
-                return Err(SorobanHelperError::NotSupported(
-                    "Address authorization not yet supported".to_string(),
-                ));
+            if let SorobanCredentials::Address(creds) = &auth.credentials {
+                return Err(SorobanHelperError::NotSupported(format!(
+                    "auth entry requires a signature from {}; build the transaction and use \
+                     simulate_transaction_with_auth / sign_auth_entry to provide it",
+                    creds.address
+                )));
             }
         }
     }

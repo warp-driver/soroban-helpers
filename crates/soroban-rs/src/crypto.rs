@@ -6,7 +6,8 @@ use crate::error::SorobanHelperError;
 use sha2::{Digest, Sha256};
 use stellar_xdr::curr::{
     ContractIdPreimage, ContractIdPreimageFromAddress, Hash, HashIdPreimage,
-    HashIdPreimageContractId, Limits, ScAddress, Uint256, WriteXdr,
+    HashIdPreimageContractId, HashIdPreimageSorobanAuthorization, Limits, ScAddress,
+    SorobanAuthorizedInvocation, Uint256, WriteXdr,
 };
 
 /// Computes the SHA-256 hash of the provided data.
@@ -71,6 +72,47 @@ pub fn calculate_contract_id(
     let contract_id = stellar_strkey::Contract(Sha256::digest(preimage_xdr).into());
 
     Ok(contract_id)
+}
+
+/// Computes the digest a Soroban host recomputes for an `Address`-credential
+/// authorization entry and feeds to the address's signature check (the account
+/// contract's `__check_auth`, or the host's built-in ed25519 verification for a
+/// classic account).
+///
+/// It is the SHA-256 of the XDR-encoded
+/// `HashIdPreimage::SorobanAuthorization { network_id, nonce,
+/// signature_expiration_ledger, invocation }`. Signing this digest is the core
+/// of the `authorizeEntry` flow.
+///
+/// # Parameters
+///
+/// * `network_id` - The network ID hash (see [`crate::Env::network_id`])
+/// * `nonce` - The credential nonce, as returned by simulation
+/// * `signature_expiration_ledger` - The ledger after which the signature is invalid
+/// * `invocation` - The authorized invocation tree (the entry's `root_invocation`)
+///
+/// # Errors
+///
+/// Returns `SorobanHelperError::XdrEncodingFailed` if the preimage cannot be
+/// encoded to XDR.
+pub fn auth_preimage_hash(
+    network_id: &Hash,
+    nonce: i64,
+    signature_expiration_ledger: u32,
+    invocation: &SorobanAuthorizedInvocation,
+) -> Result<Hash, SorobanHelperError> {
+    let preimage = HashIdPreimage::SorobanAuthorization(HashIdPreimageSorobanAuthorization {
+        network_id: network_id.clone(),
+        nonce,
+        signature_expiration_ledger,
+        invocation: invocation.clone(),
+    });
+
+    let preimage_xdr = preimage
+        .to_xdr(Limits::none())
+        .map_err(|e| SorobanHelperError::XdrEncodingFailed(e.to_string()))?;
+
+    Ok(sha256_hash(&preimage_xdr))
 }
 
 #[cfg(test)]
