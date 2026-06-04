@@ -3045,6 +3045,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "warpdrive-multisig-account"
+version = "0.2.9"
+dependencies = [
+ "ed25519-dalek",
+ "sha2",
+ "soroban-sdk",
+ "wasi-soroban-rs",
+]
+
+[[package]]
 name = "wasi"
 version = "0.11.1+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3122,7 +3132,7 @@ dependencies = [
 
 [[package]]
 name = "wasi-soroban-rs"
-version = "0.2.8"
+version = "0.2.9"
 dependencies = [
  "async-trait",
  "dotenv",
@@ -3140,7 +3150,7 @@ dependencies = [
 
 [[package]]
 name = "wasi-soroban-rs-macros"
-version = "0.2.8"
+version = "0.2.9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3149,7 +3159,7 @@ dependencies = [
 
 [[package]]
 name = "wasi-soroban-test-helpers"
-version = "0.2.8"
+version = "0.2.9"
 dependencies = [
  "proc-macro2",
  "quote",

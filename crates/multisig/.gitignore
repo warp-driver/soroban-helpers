@@ -1,0 +1,3 @@
+# soroban-sdk test snapshots are regenerated on every `cargo test` run; they
+# are debugging artifacts, not assertions, so keep them out of version control.
+test_snapshots/

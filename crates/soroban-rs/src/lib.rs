@@ -1,4 +1,5 @@
 mod account;
+mod auth;
 mod contract;
 mod crypto;
 mod env;
@@ -16,6 +17,7 @@ mod signer;
 mod transaction;
 
 pub use account::{Account, AccountConfig, MultisigAccount, SingleAccount};
+pub use auth::{sign_auth_entry, simulate_transaction_with_auth};
 pub use contract::{ClientContractConfigs, Contract};
 pub use env::{Env, EnvConfigs};
 pub use error::SorobanHelperError;

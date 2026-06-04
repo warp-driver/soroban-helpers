@@ -4,7 +4,8 @@ members = [
   "crates/soroban-test-helpers",
   "crates/example",
   "crates/soroban-rs",
-  "crates/soroban-rs-macros"
+  "crates/soroban-rs-macros",
+  "crates/multisig"
 ]
 default-members = ["crates/soroban-test-helpers"]
 
