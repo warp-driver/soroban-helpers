@@ -3046,7 +3046,7 @@ dependencies = [
 
 [[package]]
 name = "warpdrive-multisig-account"
-version = "0.1.0"
+version = "0.2.9"
 dependencies = [
  "ed25519-dalek",
  "sha2",
@@ -3132,7 +3132,7 @@ dependencies = [
 
 [[package]]
 name = "wasi-soroban-rs"
-version = "0.2.8"
+version = "0.2.9"
 dependencies = [
  "async-trait",
  "dotenv",
@@ -3150,7 +3150,7 @@ dependencies = [
 
 [[package]]
 name = "wasi-soroban-rs-macros"
-version = "0.2.8"
+version = "0.2.9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3159,7 +3159,7 @@ dependencies = [
 
 [[package]]
 name = "wasi-soroban-test-helpers"
-version = "0.2.8"
+version = "0.2.9"
 dependencies = [
  "proc-macro2",
  "quote",
